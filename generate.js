@@ -1,8 +1,12 @@
 const WORDLIST_FILE = 'phrases.txt';
-const OUTPUT_TEX = 'out.tex';
+const OUTPUT_TEX = 'bingo.tex';
 
 function splitStringToWordlist (string) {
     return string.split('\r\n');
+}
+
+function getRandomIndex (length) {
+    return Math.floor(Math.random() * length);
 }
 
 function generateLatexString (wordlist) {
@@ -20,7 +24,28 @@ function generateLatexString (wordlist) {
     string += '\\newcolumntype{n}{>{\\centering\\arraybackslash}X}\r\n';
     string += '\\pagestyle{empty}\r\n';
     string += '\\begin{document}\r\n';
-    string += 'this is a test\r\n';
+    string += '\\begin{tabularx}{\\textwidth}{|';
+    for (let i = 0; i < width; i++) {
+        string += 'n|';
+    }
+    string += '}\r\n';
+    string += '\\hline\r\n';
+    for (let i = 0; i < width; i++) {
+        for (let j = 0; j < width; j++) {
+            if (wordlist.length > 0) {
+                let index = getRandomIndex(wordlist.length)
+                string += wordlist.splice(index, 1)[0];
+            }
+
+            if (j < width - 1) {
+                string += ' & '
+            } else {
+                string += '\\\\\r\n';
+            }
+        }
+        string += '\\hline\r\n';
+    }
+    string += '\\end{tabularx}\r\n';
     string += '\\end{document}\r\n';
 
     return string;
