@@ -15,40 +15,50 @@ function generateLatexString (wordlist) {
         width = 5;
     }
     let string = '\\documentclass{article}\r\n';
-    string += '\\usepackage{geometry}\r\n';
-    string += '\\usepackage{tabularx}\r\n';
-    string += '\\geometry{\r\n';
-    string += 'a4paper,\r\n';
-    string += 'margin=3cm\r\n';
-    string += '}\r\n';
-    string += '\\renewcommand{\\tabularxcolumn}[1]{>{\\normalsize}m{#1}}\r\n';
-    string += '\\renewcommand{\\arraystretch}{2}\r\n';
-    string += '\\newcolumntype{n}{>{\\centering\\arraybackslash}X}\r\n';
-    string += '\\newcolumntype{n}{>{\\centering\\arraybackslash}X}\r\n';
-    string += '\\pagestyle{empty}\r\n';
-    string += '\\begin{document}\r\n';
-    string += '\\begin{tabularx}{\\textwidth}{|';
+    string += '\\usepackage[a4paper,margin=2cm]{geometry}\r\n';
+    string += '\\usepackage{tikz}\r\n';
+    string += '\\usetikzlibrary{calc}';
+    string += `\\newcommand{\\Size}{${Math.floor(100/width)/100}\\textwidth}\r\n`;
+    string += `\\def\\NumOfColumns{${width}}`;
+    string += '\\def\\Sequence{';
     for (let i = 0; i < width; i++) {
-        string += 'n|';
+        string += `${i+1}/${String.fromCharCode(i+65)}`;
+        if (i < width - 1) {
+            string += ', ';
+        }
     }
     string += '}\r\n';
-    string += '\\hline\r\n';
+    string += '\\tikzset{Square/.style={\r\n';
+    string += 'inner sep=0pt,\r\n';
+    string += 'text width=\\Size,\r\n';
+    string += 'minimum size=\\Size,\r\n';
+    string += 'draw=black,\r\n';
+    string += 'fill=white,\r\n';
+    string += 'align=center\r\n';
+    string += '}\r\n';
+    string += '}\r\n';
     for (let i = 0; i < width; i++) {
         for (let j = 0; j < width; j++) {
+            let word = '';
             if (wordlist.length > 0) {
                 let index = getRandomIndex(wordlist.length)
-                string += wordlist.splice(index, 1)[0];
+                word = wordlist.splice(index, 1)[0];
             }
-
-            if (j < width - 1) {
-                string += ' & '
-            } else {
-                string += '\\\\\r\n';
-            }
+            string += `\\newcommand{\\Node${String.fromCharCode(65+i,65+j)}}{\\large ${word}}\r\n`;
         }
-        string += '\\hline\r\n';
     }
-    string += '\\end{tabularx}\r\n';
+    string += '\\begin{document}\r\n';
+    string += '\\begin{center}\r\n';
+    string += '\\begin{tikzpicture}[draw=black, ultra thick, x=\\Size,y=\\Size]\r\n';
+    string += '    \\foreach \\col/\\colLetter in \\Sequence {%\r\n';
+    string += '        \\foreach \\row/\\rowLetter in \\Sequence{%\r\n';
+    string += '            \\pgfmathtruncatemacro{\\value}{\\col+\\NumOfColumns*(\\row-1)}\r\n';
+    string += '            \\def\\NodeText{\\expandafter\\csname Node\\rowLetter\\colLetter\\endcsname}\r\n';
+    string += '            \\node [Square] at ($(\\col,-\\row)-(0.5,0.5)$) {\\NodeText};\r\n';
+    string += '        }\r\n';
+    string += '    }\r\n';
+    string += '\\end{tikzpicture}\r\n';
+    string += '\\end{center}\r\n';
     string += '\\end{document}\r\n';
 
     return string;
