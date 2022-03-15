@@ -11,6 +11,9 @@ function getRandomIndex (length) {
 
 function generateLatexString (wordlist) {
     let width = Math.ceil(Math.sqrt(wordlist.length));
+    if (width > 5) {
+        width = 5;
+    }
     let string = '\\documentclass{article}\r\n';
     string += '\\usepackage{geometry}\r\n';
     string += '\\usepackage{tabularx}\r\n';
