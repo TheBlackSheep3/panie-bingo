@@ -47,6 +47,7 @@ function generateLatexString (wordlist) {
             string += `\\newcommand{\\Node${String.fromCharCode(65+i,65+j)}}{\\large ${word}}\r\n`;
         }
     }
+    string += '\\pagestyle{empty}\r\n';
     string += '\\begin{document}\r\n';
     string += '\\begin{center}\r\n';
     string += '\\begin{tikzpicture}[draw=black, ultra thick, x=\\Size,y=\\Size]\r\n';
